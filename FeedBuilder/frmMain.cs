@@ -459,7 +459,7 @@ namespace FeedBuilder
 				thisItem.SubItems.Add(thisInfo.FileInfo.Length.ToString(CultureInfo.InvariantCulture));
 				thisItem.SubItems.Add(thisInfo.FileInfo.LastWriteTime.ToString(CultureInfo.InvariantCulture));
 				thisItem.SubItems.Add(thisInfo.Hash);
-				thisItem.Checked = (!Settings.Default.IgnoreFiles.Contains(thisInfo.FileInfo.Name));
+				thisItem.Checked = (!Settings.Default.IgnoreFiles.Contains(thisInfo.FileInfo.Extension));
 				thisItem.Tag = thisInfo;
 				lstFiles.Items.Add(thisItem);
 			}
