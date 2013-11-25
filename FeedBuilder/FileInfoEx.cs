@@ -32,7 +32,7 @@ namespace FeedBuilder
 			myFileInfo = new FileInfo(fileName);
 			myFileVersion = FileVersionInfo.GetVersionInfo(fileName).FileVersion;
 			myHash = NAppUpdate.Framework.Utils.FileChecksum.GetSHA256Checksum(fileName);
-            RelativeName = fileName.Substring(rootDirLength + 1);
+            RelativeName = fileName.Substring(rootDirLength);
 		}
 	}
 }

@@ -48,8 +48,6 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -58,6 +56,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
+    <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\INauFieldsHolder.cs" />
@@ -102,6 +101,7 @@
     <Compile Include="Utils\FileSystem.cs" />
     <Compile Include="Utils\PermissionsCheck.cs" />
     <Compile Include="Utils\Reflection.cs" />
+    <Compile Include="Tasks\SQLiteScriptTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
