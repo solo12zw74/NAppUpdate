@@ -2,7 +2,7 @@ using System;
 using NAppUpdate.Framework.Tasks;
 using NAppUpdate.Framework.Common;
 using NAppUpdate.Framework.Sources;
-using Mono.Data.Sqlite;
+using System.Data.SQLite;
 using System.IO;
 
 namespace NAppUpdate.Framework
@@ -38,8 +38,7 @@ namespace NAppUpdate.Framework
 				return;
 			}
 
-			_dbFile = Path.Combine(Path.GetDirectoryName(UpdateManager.Instance.ApplicationPath), DbFile);
-			SqliteConnectionStringBuilder b = new SqliteConnectionStringBuilder ();
+			_dbFile = Path.Combine(Path.GetDirectoryName(UpdateManager.Instance.ApplicationPath), DbFile);			
 
 			_connectionString = String.Format ("Data Source={0};Version=3;{1}",_dbFile, string.IsNullOrEmpty(Password) ? string.Empty : String.Format("Password={0};",Password));
 
@@ -51,7 +50,7 @@ namespace NAppUpdate.Framework
 			string baseUrl = UpdateManager.Instance.BaseUrl;
 			string tempFileLocal = Path.Combine(UpdateManager.Instance.Config.TempFolder, Guid.NewGuid().ToString());
 
-			UpdateManager.Instance.Logger.Log("SQLiteScriptTask: Downloading {0} with BaseUrl of {1} to {2}", fileName, baseUrl, tempFileLocal);
+			UpdateManager.Instance.Logger.Log("SQLiteScriptTask: Downloading {0} with BaseUrl of {1} to {2}", DbFile, baseUrl, tempFileLocal);
 
 			if (!source.GetData (ScriptFile, baseUrl, OnProgress, ref tempFileLocal)) {
 				ExecutionStatus = TaskExecutionStatus.FailedToPrepare;
@@ -77,21 +76,23 @@ namespace NAppUpdate.Framework
 			if (string.IsNullOrEmpty(ScriptFile))
 			{
 				UpdateManager.Instance.Logger.Log(Logger.SeverityLevel.Warning, "SQLiteScriptTask: ScriptFile is empty, task is a noop");
-				return;
+				return TaskExecutionStatus.Successful;
 			}
 
 			if (string.IsNullOrEmpty(DbFile))
 			{
 				UpdateManager.Instance.Logger.Log(Logger.SeverityLevel.Warning, "SQLiteScriptTask: DbFile is empty, task is a noop");
-				return;
+                return TaskExecutionStatus.Successful;
 			}
 
-			using (SqliteConnection connection = new SqliteConnection (_connectionString)) {
+            using (SQLiteConnection connection = new SQLiteConnection(_connectionString))
+            {
 				try {
 					connection.Open();
 					var transaction = connection.BeginTransaction ();
 					var commands = File.ReadAllLines (_tempScript);
-					using (SqliteCommand sqlCommand = new SqliteCommand (connection)) {
+                    using (SQLiteCommand sqlCommand = new SQLiteCommand(connection))
+                    {
 						sqlCommand.Transaction = transaction;
 							sqlCommand.CommandTimeout = 5000;
 						try {
@@ -100,10 +101,10 @@ namespace NAppUpdate.Framework
 								sqlCommand.CommandText = commandText;
 								sqlCommand.ExecuteNonQuery();
 							}
-							connection.Commit ();
-						} catch (SqliteException ex) {
+                            transaction.Commit();							
+						} catch (SQLiteException ex) {
 							UpdateManager.Instance.Logger.Log (Logger.SeverityLevel.Error, "SQLiteScriptTask: Execute; Commands execution failed with code {0}. Command: {1}", ex.ErrorCode, sqlCommand.CommandText);
-							connection.RollBack ();
+                            transaction.Rollback();
 							return TaskExecutionStatus.Failed;
 						} finally {
 							connection.Close ();
@@ -125,7 +126,7 @@ namespace NAppUpdate.Framework
 
 		bool tryToOpenDatabase (string connectionString)
 		{
-			SqliteConnection c = new SqliteConnection(connectionString);
+            SQLiteConnection c = new SQLiteConnection(connectionString);
 			try {
 				c.Open();
 				c.Close();
