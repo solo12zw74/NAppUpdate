@@ -28,3 +28,6 @@ Thumbs.db
 *\updater.exe
 *.orig
 packages/
+*.userprefs
+
+*.exe
